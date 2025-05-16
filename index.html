@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video & Shorts Getter - All Ads</title>
+    <style>
+        /* Using the same "Ultra-Simple, Stable Full-Screen UI" CSS from before */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; }
+        body {
+            font-family: Arial, sans-serif; background-color: #222;
+            color: #ddd; display: flex; justify-content: center; align-items: center;
+        }
+        .container {
+            width: 100%; height: 100%; background-color: #333;
+            padding: 5px 10px 10px 10px; display: flex; flex-direction: column;
+            text-align: center; overflow-y: auto;
+        }
+        .ad-slot {
+            width: 100%; display: flex; justify-content: center;
+            align-items: center; margin-bottom: 10px; overflow: hidden;
+        }
+        .ad-slot-banner { min-height: 50px; }
+        .ad-slot-rectangle { min-height: 250px; margin-top: 10px; margin-bottom: 10px;}
+
+        .header-content { margin-bottom: 10px; }
+        .header-content h1 { font-size: 22px; color: #FFD700; margin-bottom: 8px;}
+        .instruction-text { font-size: 14px; margin-bottom: 15px; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width:100%;}
+        .input-group { width: 100%; max-width: 350px; margin-bottom: 15px; }
+        input[type="text"] {
+            width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #666;
+            background-color: #444; color: #fff; font-size: 16px;
+        }
+        button {
+            padding: 12px 20px; margin: 5px; border-radius: 5px; border: none;
+            background-color: #007bff; color: white; font-size: 15px; cursor: pointer;
+            min-width: 160px; /* Slightly wider */
+        }
+        .download-options { display: none; margin-top: 10px; }
+        .download-options button { background-color: #dc3545; } /* All ad-required now */
+
+        .footer-content { margin-top: auto; padding-top: 10px; }
+        .note { font-size: 12px; color: #aaa; margin-bottom: 10px; }
+        #statusMessage .message { padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 14px;}
+        #statusMessage .message.error { background-color: #721c24; color: #f8d7da; border: 1px solid #f5c6cb;}
+        #statusMessage .message.info { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+
+        #adOverlay { /* Styles remain the same */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
+            flex-direction: column; text-align: center; padding: 20px;
+        }
+        #adContent { background-color: #444; padding: 20px; border-radius: 10px; color: #fff; max-width:340px; }
+        #adContent h2 { margin-bottom: 10px; font-size: 18px; }
+        #overlayBannerAdContainer {
+            width: 320px; height: 50px; background-color: #555;
+            margin: 10px auto; display:flex; align-items:center; justify-content:center;
+            color: #888; font-style: italic;
+        }
+        #adTimer { font-size: 20px; font-weight: bold; color: #FFD700; margin:15px 0; }
+        #skipAdButton { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ALWAYS VISIBLE AD SLOT 1: Top Banner (Key 4ec5...) -->
+        <div class="ad-slot ad-slot-banner">
+            <script type="text/javascript">
+                atOptions = { 'key' : '4ec58f15fafac642ab276372f3645bfd', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/4ec58f15fafac642ab276372f3645bfd/invoke.js"></script>
+        </div>
+
+        <div class="header-content">
+            <h1>Video & Shorts Getter</h1>
+            <p class="instruction-text">Paste YouTube URL & choose your path.</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-group">
+                <input type="text" id="youtubeUrl" placeholder="YouTube URL (Video or Short)...">
+            </div>
+
+            <!-- ALWAYS VISIBLE AD SLOT 2: Rectangle (Key fb1b...) -->
+            <div class="ad-slot ad-slot-rectangle">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'fb1b7cecb8a6034c9f69ddbe43827188', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/fb1b7cecb8a6034c9f69ddbe43827188/invoke.js"></script>
+            </div>
+
+            <button id="getVideoInfoButton" onclick="getVideoInfo()">Get Download Options</button>
+            <div id="downloadOptions" class="download-options">
+                {/* Buttons will be dynamically added by JS based on video type */}
+            </div>
+            <div id="statusMessage"></div>
+        </div>
+
+        <div class="footer-content">
+            <p class="note">
+                Disclaimer: All downloads require ad step. Redirection varies.
+            </p>
+             <!-- ALWAYS VISIBLE AD SLOT 3: Bottom Banner (Using 4ec5... key again as placeholder) -->
+            <div class="ad-slot ad-slot-banner" style="margin-top: 10px;">
+                <script type="text/javascript">
+                    atOptions = { 'key' : '4ec58f15fafac642ab276372f3645bfd', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/4ec58f15fafac642ab276372f3645bfd/invoke.js"></script>
+            </div>
+        </div>
+    </div>
+
+    <div id="adOverlay">
+        <div id="adContent">
+            <h2>Ad Experience</h2>
+            <div id="overlayBannerAdContainer">
+                {/* Ad script for 4ec5... will be injected here by JavaScript for the overlay */}
+            </div>
+            <p>Proceeding in: <span id="adTimer">15</span>s</p>
+            <button id="skipAdButton" onclick="skipAdAndProceed()">Skip This Step</button>
+        </div>
+    </div>
+
+    <script>
+        let currentVideoData = null; // Will store { id, isShort, originalUrl }
+        let currentQualitySelection = null; // Stores '720p', '1080p', 'audio', or 'short'
+        let adTimerInterval = null;
+
+        function getVideoData(url) {
+            const shortsRegex = /(?:youtube\.com\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+            const videoRegex = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+            
+            let match = shortsRegex.exec(url);
+            if (match && match[1]) {
+                return { id: match[1], isShort: true, originalUrl: url };
+            }
+            
+            match = videoRegex.exec(url);
+            if (match && match[1]) {
+                return { id: match[1], isShort: false, originalUrl: url };
+            }
+            return null;
+        }
+
+        function displayMessage(message, type = 'info') {
+            const statusMessageDiv = document.getElementById('statusMessage');
+            statusMessageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+
+        function populateDownloadOptions() {
+            const optionsContainer = document.getElementById('downloadOptions');
+            optionsContainer.innerHTML = ''; // Clear previous options
+
+            if (!currentVideoData) return;
+
+            if (currentVideoData.isShort) {
+                const shortButton = document.createElement('button');
+                shortButton.textContent = 'Download Short (Ad First)';
+                shortButton.onclick = () => prepareDownload('short');
+                optionsContainer.appendChild(shortButton);
+            } else {
+                const qualities = ['720p', '1080p', 'Audio'];
+                qualities.forEach(q => {
+                    const button = document.createElement('button');
+                    button.textContent = `${q} (Ad First)`;
+                    button.onclick = () => prepareDownload(q.toLowerCase()); // Ensure consistent casing
+                    optionsContainer.appendChild(button);
+                });
+            }
+            optionsContainer.style.display = 'block';
+        }
+
+
+        function getVideoInfo() {
+            const urlInput = document.getElementById('youtubeUrl');
+            const youtubeUrl = urlInput.value.trim();
+            const statusMessageDiv = document.getElementById('statusMessage');
+            statusMessageDiv.innerHTML = '';
+            document.getElementById('downloadOptions').style.display = 'none';
+
+
+            if (!youtubeUrl) {
+                displayMessage('❌ Please enter a YouTube URL.', 'error');
+                urlInput.focus();
+                return;
+            }
+            currentVideoData = getVideoData(youtubeUrl);
+
+            if (!currentVideoData) {
+                displayMessage('⚠️ Invalid YouTube URL format.', 'error');
+                urlInput.focus();
+                return;
+            }
+
+            displayMessage(`✨ Video type identified! (ID: ${currentVideoData.id}, Short: ${currentVideoData.isShort})`, 'info');
+            populateDownloadOptions();
+            document.getElementById('getVideoInfoButton').style.display = 'none';
+        }
+
+        function prepareDownload(qualityOrType) {
+            currentQualitySelection = qualityOrType; // e.g., '720p', '1080p', 'audio', 'short'
+            if (!currentVideoData || !currentVideoData.id) {
+                displayMessage('❓ Please get video info first.', 'error');
+                return;
+            }
+            // ALL downloads now go through the ad simulation
+            showSimulatedAd();
+        }
+
+        function loadBannerAdInOverlay() {
+            const adContainer = document.getElementById('overlayBannerAdContainer');
+            adContainer.innerHTML = ''; 
+            adContainer.style.backgroundColor = 'transparent';
+
+            const scriptOptions = document.createElement('script');
+            scriptOptions.type = 'text/javascript';
+            scriptOptions.innerHTML = `
+                atOptions = {
+                    'key' : '4ec58f15fafac642ab276372f3645bfd',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            `;
+            adContainer.appendChild(scriptOptions);
+
+            const scriptInvoke = document.createElement('script');
+            scriptInvoke.type = 'text/javascript';
+            scriptInvoke.src = '//www.highperformanceformat.com/4ec58f15fafac642ab276372f3645bfd/invoke.js';
+            scriptInvoke.async = true;
+            adContainer.appendChild(scriptInvoke);
+        }
+
+        function resetOverlayBannerAd() {
+            const adContainer = document.getElementById('overlayBannerAdContainer');
+            adContainer.innerHTML = '<!-- Ad Cleared -->'; 
+            adContainer.style.backgroundColor = '#555'; 
+        }
+
+        function showSimulatedAd() {
+            const adOverlay = document.getElementById('adOverlay');
+            const adTimerSpan = document.getElementById('adTimer');
+            const skipButton = document.getElementById('skipAdButton');
+
+            loadBannerAdInOverlay(); 
+
+            adOverlay.style.display = 'flex';
+            skipButton.style.display = 'none';
+
+            let timeLeft = 15;
+            adTimerSpan.textContent = timeLeft;
+
+            if(adTimerInterval) clearInterval(adTimerInterval);
+
+            adTimerInterval = setInterval(() => {
+                timeLeft--;
+                adTimerSpan.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(adTimerInterval);
+                    resetOverlayBannerAd(); 
+                    adOverlay.style.display = 'none';
+                    proceedToDownload(true); // Ad was "seen"
+                }
+                if (timeLeft <= 10) { // Show skip button after 5 seconds
+                    skipButton.style.display = 'inline-block';
+                }
+            }, 1000);
+        }
+
+        function skipAdAndProceed() {
+            if(adTimerInterval) clearInterval(adTimerInterval);
+            resetOverlayBannerAd(); 
+            document.getElementById('adOverlay').style.display = 'none';
+
+            // Since ALL downloads require ad step, skipping always means no download.
+            displayMessage('🚫 Ad step skipped. Download requires completing this step.', 'error');
+            document.getElementById('downloadOptions').style.display = 'none';
+            document.getElementById('getVideoInfoButton').style.display = 'block';
+            document.getElementById('youtubeUrl').value = '';
+            currentVideoData = null;
+            currentQualitySelection = null;
+        }
+
+        function proceedToDownload(adWasSeen = false) {
+            if (!currentVideoData || !currentVideoData.id) {
+                displayMessage('❓ Video data lost. Please try again.', 'error');
+                return;
+            }
+
+            if (!adWasSeen) { // This check is now more critical
+                displayMessage('🚫 Ad process incomplete. Download aborted.', 'error');
+                if(adTimerInterval) clearInterval(adTimerInterval); // Ensure timer is stopped
+                resetOverlayBannerAd();
+                document.getElementById('adOverlay').style.display = 'none'; // Ensure overlay is hidden
+                // Reset UI fully
+                document.getElementById('downloadOptions').style.display = 'none';
+                document.getElementById('getVideoInfoButton').style.display = 'block';
+                document.getElementById('youtubeUrl').value = '';
+                currentVideoData = null;
+                currentQualitySelection = null;
+                return;
+            }
+
+            let targetUrl = '';
+            let qualityNote = "";
+
+            if (currentQualitySelection === 'short') {
+                // For yt1d, you typically pass the full YouTube URL as a query parameter
+                targetUrl = `https://yt1d.com/en306/?url=${encodeURIComponent(currentVideoData.originalUrl)}`;
+                qualityNote = " (Short)";
+            } else {
+                // For regular videos, redirect to Cobalt
+                targetUrl = `https://cobalt.tools/youtube/${currentVideoData.id}`;
+                if (currentQualitySelection === '720p') qualityNote = " (aiming for 720p)";
+                if (currentQualitySelection === '1080p') qualityNote = " (aiming for 1080p)";
+                if (currentQualitySelection === 'audio') qualityNote = " (aiming for Audio)";
+            }
+            
+            displayMessage(`✨ Opening download page...${qualityNote}`, 'info');
+            window.open(targetUrl, '_blank');
+
+            // Reset UI
+            document.getElementById('downloadOptions').style.display = 'none';
+            document.getElementById('getVideoInfoButton').style.display = 'block';
+            document.getElementById('youtubeUrl').value = '';
+            currentVideoData = null;
+            currentQualitySelection = null;
+        }
+    </script>
+</body>
+</html>
